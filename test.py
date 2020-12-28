@@ -37,16 +37,6 @@ for i in FlagFile: q_x.append(eval(i))
 import cv2
 img=cv2.imread("c:\\ctf\\flag.png",1)
 iq_y=img.flatten()[1::3]//200
-q_x=[]
-
-
-import tqdm as  tq
-print('生成测试数据：')
-for i in tq.tqdm(iq_y):
-    t = [random.randint(-64, 64) for i in range(6)]
-    while func_en(t) != i:
-        t= [random.randint(-64,64) for i in range(6)]
-    q_x.append(t)
 
 
 
@@ -88,7 +78,7 @@ for epoch in tqdm.trange(3000): #训练三千轮，其实如果到了1000轮的�
     loss = criterion(y_pred, t_y) #损失计算
     loss.backward()#反馈
     optimizer.step()#优化
-    if epoch % 2==0:#动态显示，如果训练了1000轮还不知所云就重启吧，这玩意很玄学 可以调大一些 但是我喜欢看着flag慢慢浮现的样纸，你咬我啊
+    if epoch % 50==0:#动态显示，如果训练了1000轮还不知所云就重启吧，这玩意很玄学 可以调大一些 但是我喜欢看着flag慢慢浮现的样纸，你咬我啊
         y_pred = net(q_x)
         y_pred = np.array(torch.argmax(y_pred.cpu(), dim=1))
         img=y_pred.reshape(79,991)#图像长宽，分解因数可得到
