@@ -9,8 +9,6 @@ import struct
 from itertools import permutations
 from zlib import crc32
 from itertools import cycle
-import base128
-import base58
 import base91
 import base92
 import gmpy2
@@ -19,7 +17,8 @@ from Crypto.Cipher import PKCS1_v1_5 as Cipher_pkcs1_v1_5
 from Crypto.PublicKey import RSA
 from bubblepy import BubbleBabble
 import pycipher
-
+import base58
+import base128
 import utfc.UtilFuction as uf
 from utfc.ngram_score import ngram_score
 from utfc.StrFunc import *
