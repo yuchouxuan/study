@@ -270,8 +270,8 @@ class CharF:
                 d[i] = 1
         print('Len : ', len(txt))
         print('Chr : ', len(d))
-        print('ChrF: ', OrderByValue.d2str(d))
-        print('ChrO: ', ''.join(sorted(d.keys())))
+        print('ChrF: ', list(OrderByValue.d2str(d)))
+        print('ChrO: ', (sorted(d.keys())))
         return OrderByValue.d2l(d)
 
     @staticmethod

@@ -1,25 +1,14 @@
-import matplotlib.pyplot as plt
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
 import tqdm
-import numpy as np
-
 import math
-import seaborn as sns
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-from sklearn.metrics import accuracy_score
-import random
 import numpy as np
 def func_en(arr=[]):
     x= (6*arr[0]+7*arr[1]+3*arr[2]+7*arr[3]+3*arr[4])*(math.sin(math.pi*arr[5]/24))
     return 1 if x>=0 else 0
-
 # 训练集, 因为这个题可以实时看到结果，反正我们只需要拿到flag，又不准备训练个多好的网络，所以完全不需要测试集
 trainFile=open("c:\\ctf\\t.txt",'r').readlines()
 t_x = []
@@ -32,15 +21,6 @@ for i in trainFile:
 q_x=[]
 FlagFile=open("c:/ctf/flag.txt",'r').readlines()
 for i in FlagFile: q_x.append(eval(i))
-
-
-import cv2
-img=cv2.imread("c:\\ctf\\flag.png",1)
-iq_y=img.flatten()[1::3]//200
-
-
-
-
 in_V = 6 #输入张量的维度
 #定义一个 三层全连接网络
 class Net(nn.Module):
@@ -59,7 +39,6 @@ class Net(nn.Module):
         x = self.drop(F.sigmoid(self.h0(x)))
         x = self.drop(F.sigmoid(self.h1(x)))
         return F.sigmoid(self.h2(x))
-
 print('训练测试网络：')
 #你需要一块能做CUDA加速的显卡
 device =torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -67,7 +46,6 @@ device =torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 t_x = torch.tensor(np.array(t_x), dtype=torch.float).to(device)
 t_y= torch.tensor(np.array(t_y), dtype=torch.long).to(device)
 q_x = torch.tensor(np.array(q_x), dtype=torch.float).to(device)
-
 net = Net().to(device)  # 实例化神经网络
 optimizer = optim.Adam(net.parameters(), lr=0.001)  # 据说adam算法比较时髦，且好用 其实SGD啥的都行 可以挨个试试
 criterion = nn.CrossEntropyLoss()# 交叉熵损失函数
@@ -86,75 +64,3 @@ for epoch in tqdm.trange(3000): #训练三千轮，一般情况下200-500轮应�
         plt.imshow(img)
         plt.pause(0.0001)
 plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

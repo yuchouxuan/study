@@ -1175,9 +1175,9 @@ class Caesar:  # 凯撒密码
         return chr(num)
 
     @staticmethod
-    def jm(string, i):
+    def jm(st, i):
         string_new = ''
-        for s in string:
+        for s in st:
             string_new += Caesar.change(s, i)
         return string_new
 
