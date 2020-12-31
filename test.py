@@ -1,66 +1,62 @@
-import tqdm
-import math
-import matplotlib.pyplot as plt
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
+from gmpy2 import  *
+import gmpy2
 import numpy as np
-def func_en(arr=[]):
-    x= (6*arr[0]+7*arr[1]+3*arr[2]+7*arr[3]+3*arr[4])*(math.sin(math.pi*arr[5]/24))
-    return 1 if x>=0 else 0
-# 训练集, 因为这个题可以实时看到结果，反正我们只需要拿到flag，又不准备训练个多好的网络，所以完全不需要测试集
-trainFile=open("c:\\ctf\\t.txt",'r').readlines()
-t_x = []
-t_y = []
-for i in trainFile:
-        s=i.strip().split('\t')
-        t_y.append(int(s[0]))
-        t_x.append(eval(s[1]))
-#flag文件读取
-q_x=[]
-FlagFile=open("c:/ctf/flag.txt",'r').readlines()
-for i in FlagFile: q_x.append(eval(i))
-in_V = 6 #输入张量的维度
-#定义一个 三层全连接网络
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        # 输入层
-        self.lin = nn.Linear(in_V, in_V * 64)
-        # 全连接层
-        self.h0 = nn.Linear(in_V * 64, in_V * 64)
-        self.h1 = nn.Linear(in_V * 64, in_V * 64)
-        self.h2 = nn.Linear(in_V * 64, 2)
-        self.drop = nn.Dropout(p=0.3) #防止过拟合的drop函数，其实这个题厚道的送分狸给的训练集很友好，没有也行，而且吧drop设的小点（比如0.1）出结果更快些,
-                                      #但是，玩这东西，避免过拟合应该是类似于强迫症的存在，所以，我还是决定用0.5的默认值了 哈哈
-    def forward(self, x):
-        x = self.drop(F.sigmoid(self.lin(x)))#激活函数试了一下 sigmoid是效果最好的
-        x = self.drop(F.sigmoid(self.h0(x)))
-        x = self.drop(F.sigmoid(self.h1(x)))
-        return F.sigmoid(self.h2(x))
-print('训练测试网络：')
-#你需要一块能做CUDA加速的显卡
-device =torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-#把训练集、测试集、问题集转成张量
-t_x = torch.tensor(np.array(t_x), dtype=torch.float).to(device)
-t_y= torch.tensor(np.array(t_y), dtype=torch.long).to(device)
-q_x = torch.tensor(np.array(q_x), dtype=torch.float).to(device)
-net = Net().to(device)  # 实例化神经网络
-optimizer = optim.Adam(net.parameters(), lr=0.001)  # 据说adam算法比较时髦，且好用 其实SGD啥的都行 可以挨个试试
-criterion = nn.CrossEntropyLoss()# 交叉熵损失函数
-plt.figure(figsize=(20, 2))
-for epoch in tqdm.trange(3000): #训练三千轮，一般情况下200-500轮应该就差不多了。如果到了1000轮的时候还啥都不是，那就重新 开始吧，估计是初始梯度随机到一个尴尬的地方去了
-    optimizer.zero_grad()  #梯度清零
-    y_pred = net(t_x)  #正向
-    loss = criterion(y_pred, t_y) #损失计算
-    loss.backward()#反馈
-    optimizer.step()#优化
-    if epoch % 50==0:#动态显示，如果训练了1000轮还不知所云就重启吧，这玩意很玄学 可以调大一些 但是我喜欢看着flag慢慢浮现的样纸，你咬我啊
-        y_pred = net(q_x)
-        y_pred = np.array(torch.argmax(y_pred.cpu(), dim=1))
-        img=y_pred.reshape(79,991)#图像长宽，分解因数可得到
-        plt.cla()
-        plt.imshow(img)
-        plt.pause(0.0001)
+import matplotlib.pyplot as plt
+from tqdm import *
+
+wavelen=4111
+BinF=512
+ByteinFrame=BinF//8
+dx=const_pi()/wavelen
+def makeWave(x=1):
+    d=dx*8*x
+    alpha=0
+    arr=[]
+    for i in range(wavelen):
+        arr.append(float(sin(alpha)))
+        alpha+=d
+    return np.array(arr)
+
+flagb= open('c:/ctf/flag.png','rb').read()
+bm=0x80
+tbar = tqdm(total=64)
+wavedat=np.array([])
+for Frame in trange(0,len(flagb),ByteinFrame):
+    ax = np.array([0. for i in range(wavelen)])
+    for bcont in range(ByteinFrame):
+        try:
+            x= flagb[Frame+bcont]
+        except:
+            x=0x0
+        for i in range(8):
+                if(x&(bm>>i))!=0:
+                    ax = ax + makeWave(bcont*8+i)
+        tbar.update(1)
+    wavedat = np.append(wavedat,ax)
+    tbar.update(-64)
+    break
+
+len(wavedat),max(wavedat),min(wavedat)
+WD=wavedat*200
+len(WD),max(WD),min(WD)
+import utfc.SoundF
+WD=wavedat*200
+len(WD),max(WD),min(WD)
+
+import utfc.SoundF
+WD = wavedat*2
+np.min(WD)
+wave_data= np.array(WD,np.int16)
+wave_data.tolist()
+
+a=wave_data[:wavelen]
+fft_data=np.abs(np.fft.fft(a))[:wavelen//2]
+for i in range(0,len(fft_data),4):
+    if fft_data[i]>1000 :print(1,end='')
+    else: print(0,end='')
+print()
+
+print(fft_data.tolist())
+
+plt.plot(fft_data)
 plt.show()

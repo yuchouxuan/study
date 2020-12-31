@@ -150,12 +150,9 @@ class imgBase:
         hists, bins = np.histogram(r.flatten(), 256, [0, 256])
         plt.plot(hists, line + 'r')
 
-
-
-
-def save(this, fn=''):
-    if fn == '': fn = this.fn
-    cv.imwrite(fn, this.img)
+    def save(this, fn=''):
+        if fn == '': fn = this.fn
+        cv.imwrite(fn, this.img)
 
 
 class PicQP(imgBase):  # 棋盘绘图，二维码用
@@ -241,13 +238,13 @@ class ImgBits(imgBase):  # 像素操作
             rtl.append(nb)
         return rtl
 
-@staticmethod
-def imgl2gif(image_list, gif_name, duration=0.35):
-    frames = []
-    for image_name in image_list:
-        frames.append(imageio.imread(image_name))
-    imageio.mimsave(gif_name, frames, 'GIF', duration=duration)
-    return
+    @staticmethod
+    def imgl2gif(image_list, gif_name, duration=0.35):
+        frames = []
+        for image_name in image_list:
+            frames.append(imageio.imread(image_name))
+        imageio.mimsave(gif_name, frames, 'GIF', duration=duration)
+        return
 
 
 class PicF:  #
