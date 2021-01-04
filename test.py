@@ -1,62 +1,49 @@
-from gmpy2 import  *
-import gmpy2
+import wave
+import cv2 as cv
 import numpy as np
+from PIL import Image, ImageFont
+from PIL import ImageDraw
+#学python语法时练手写的一个用于操作图像的类，代码效率很低，但实在懒得重写了
+class imgBase:
+    img = None
+    height = 0
+    weight = 0
+    def __init__(self, w=100,h=100):
+        self.weight = w
+        self.height = h
+        self.img = np.zeros((h, w, 3), np.uint8)
+        self.img.fill(255)
+    def show(self, wname='image'):
+        cv.imshow(wname, self.img)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+    def setxy(self, x=0, y=0, col=[0, 0, 0]):
+        height = self.img.shape[0]
+        weight = self.img.shape[1]
+        if x < 0: x = -x
+        if y < 0: y = -y
+        self.img[y % height, x % weight] = col
+    def save(this, fn=''):
+        if fn == '': fn = this.fn
+        cv.imwrite(fn, this.img)
 import matplotlib.pyplot as plt
-from tqdm import *
 
-wavelen=4111
-BinF=512
-ByteinFrame=BinF//8
-dx=const_pi()/wavelen
-def makeWave(x=1):
-    d=dx*8*x
-    alpha=0
-    arr=[]
-    for i in range(wavelen):
-        arr.append(float(sin(alpha)))
-        alpha+=d
-    return np.array(arr)
+def openwave(fn=''):
+    with wave.open(fn, 'rb') as f:
+        params = f.getparams()
+        print('params:', params)
+        nchannels, sampwidth, framerate, nframes = params[:4]
+        strData = f.readframes(nframes)  # 读取音频，字符串格式
+        return np.frombuffer(strData, dtype=np.int16).tolist()  # 将字符串转化为int
+data=openwave('example.wav')[::-1]
+LS=''
+for i in data:
+    if i&1==1 : LS+='1'
+    else:LS+='0'
 
-flagb= open('c:/ctf/flag.png','rb').read()
-bm=0x80
-tbar = tqdm(total=64)
-wavedat=np.array([])
-for Frame in trange(0,len(flagb),ByteinFrame):
-    ax = np.array([0. for i in range(wavelen)])
-    for bcont in range(ByteinFrame):
-        try:
-            x= flagb[Frame+bcont]
-        except:
-            x=0x0
-        for i in range(8):
-                if(x&(bm>>i))!=0:
-                    ax = ax + makeWave(bcont*8+i)
-        tbar.update(1)
-    wavedat = np.append(wavedat,ax)
-    tbar.update(-64)
-    break
-
-len(wavedat),max(wavedat),min(wavedat)
-WD=wavedat*200
-len(WD),max(WD),min(WD)
-import utfc.SoundF
-WD=wavedat*200
-len(WD),max(WD),min(WD)
-
-import utfc.SoundF
-WD = wavedat*2
-np.min(WD)
-wave_data= np.array(WD,np.int16)
-wave_data.tolist()
-
-a=wave_data[:wavelen]
-fft_data=np.abs(np.fft.fft(a))[:wavelen//2]
-for i in range(0,len(fft_data),4):
-    if fft_data[i]>1000 :print(1,end='')
-    else: print(0,end='')
-print()
-
-print(fft_data.tolist())
-
-plt.plot(fft_data)
-plt.show()
+b=[]
+for i in range(0,len(LS),8):
+    lsb=int(LS[i:i+8],2)
+    print(chr(lsb),end='')
+    b.append(lsb)
+open('a.png','wb').write(bytes(b[::-1]))
