@@ -1,32 +1,5 @@
 import wave
-import cv2 as cv
 import numpy as np
-from PIL import Image, ImageFont
-from PIL import ImageDraw
-#学python语法时练手写的一个用于操作图像的类，代码效率很低，但实在懒得重写了
-class imgBase:
-    img = None
-    height = 0
-    weight = 0
-    def __init__(self, w=100,h=100):
-        self.weight = w
-        self.height = h
-        self.img = np.zeros((h, w, 3), np.uint8)
-        self.img.fill(255)
-    def show(self, wname='image'):
-        cv.imshow(wname, self.img)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-    def setxy(self, x=0, y=0, col=[0, 0, 0]):
-        height = self.img.shape[0]
-        weight = self.img.shape[1]
-        if x < 0: x = -x
-        if y < 0: y = -y
-        self.img[y % height, x % weight] = col
-    def save(this, fn=''):
-        if fn == '': fn = this.fn
-        cv.imwrite(fn, this.img)
-import matplotlib.pyplot as plt
 
 def openwave(fn=''):
     with wave.open(fn, 'rb') as f:
