@@ -32,7 +32,7 @@ class Net(nn.Module):
         self.h0 = nn.Linear(in_V * 64, in_V * 64)
         self.h1 = nn.Linear(in_V * 64, in_V * 64)
         self.h2 = nn.Linear(in_V * 64, 2)
-        self.drop = nn.Dropout(p=0.3) #防止过拟合的drop函数，其实这个题厚道的送分狸给的训练集很友好，没有也行，而且吧drop设的小点（比如0.1）出结果更快些,
+        self.drop = nn.Dropout(p=0.5) #防止过拟合的drop函数，其实这个题厚道的送分狸给的训练集很友好，没有也行，而且吧drop设的小点（比如0.1）出结果更快些,
                                       #但是，玩这东西，避免过拟合应该是类似于强迫症的存在，所以，我还是决定用0.5的默认值了 哈哈
     def forward(self, x):
         x = self.drop(F.sigmoid(self.lin(x)))#激活函数试了一下 sigmoid是效果最好的
@@ -50,13 +50,13 @@ net = Net().to(device)  # 实例化神经网络
 optimizer = optim.Adam(net.parameters(), lr=0.001)  # 据说adam算法比较时髦，且好用 其实SGD啥的都行 可以挨个试试
 criterion = nn.CrossEntropyLoss()# 交叉熵损失函数
 plt.figure(figsize=(20, 2))
-for epoch in tqdm.trange(3000): #训练三千轮，一般情况下200-500轮应该就差不多了。如果到了1000轮的时候还啥都不是，那就重新 开始吧，估计是初始梯度随机到一个尴尬的地方去了
+for epoch in tqdm.trange(800): #训练三千轮，一般情况下200-500轮应该就差不多了。如果到了1000轮的时候还啥都不是，那就重新 开始吧，估计是初始梯度随机到一个尴尬的地方去了
     optimizer.zero_grad()  #梯度清零
     y_pred = net(t_x)  #正向
     loss = criterion(y_pred, t_y) #损失计算
     loss.backward()#反馈
     optimizer.step()#优化
-    if epoch % 50==0:#动态显示，如果训练了1000轮还不知所云就重启吧，这玩意很玄学 可以调大一些 但是我喜欢看着flag慢慢浮现的样纸，你咬我啊
+    if epoch % 10==0:#动态显示，如果训练了1000轮还不知所云就重启吧，这玩意很玄学 可以调大一些 但是我喜欢看着flag慢慢浮现的样纸，你咬我啊
         y_pred = net(q_x)
         y_pred = np.array(torch.argmax(y_pred.cpu(), dim=1))
         img=y_pred.reshape(79,991)#图像长宽，分解因数可得到
