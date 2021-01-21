@@ -13,6 +13,19 @@ WdF = [  # 字频率矩阵
 
 class CharF:
     @staticmethod
+    def half2full(half):
+        full = ''
+        for ch in half:
+            if ord(ch) in range(33, 127):
+                ch = chr(ord(ch) + 0xfee0)
+            elif ord(ch) == 32:
+                ch = chr(0x3000)
+            else:
+                pass
+            full += ch
+        return full
+
+    @staticmethod
     def str2Dir(cph='', spl1='\n', sp2=':'):
         return {i[:i.find(sp2)].strip():i[i.find(sp2) + 1:].strip()  for i in cph.split(spl1)}
     @staticmethod
