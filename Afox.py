@@ -1,8 +1,4 @@
-<< << << < HEAD
 
-== == == =
->> >> >> > 94
-cf5763ab0b9f35c03e3893ae30a8c27d42b66a
 from datetime import *
 import os
 import zipfile
